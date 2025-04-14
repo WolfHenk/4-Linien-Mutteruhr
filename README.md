@@ -126,6 +126,7 @@ Prüfen Sie: Statusanzeigen, Bearbeiten funktioniert?
 Stellen Sie Uhrzeit einer Linie testweise und beobachten Sie Ergebnis
 
 6. Besonderheiten und Verhalten
+   
 6.1 Pulsausgabe
 Nur bei aktiv = true UND stopp = false
 
