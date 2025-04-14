@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Änderung – {{ linie_id }}</title>
+</head>
+<body>
+    <h1>Linie {{ linie_id }} bearbeiten</h1>
+    <form method="post" action="/update_line">
+        <input type="hidden" name="linie_id" value="{{ linie_id }}">
+        <p>Name: <input name="name" value="{{ linie.name }}"></p>
+        <p>Istzeit (hh:mm): <input type="time" name="istzeit" value="{{ istzeit }}"></p>
+        <p>Impulsdauer (ms): <input name="impuls_ms" value="{{ linie.impuls_ms }}"></p>
+        <p>Pausendauer (ms): <input name="pause_ms" value="{{ linie.pause_ms }}"></p>
+        <p><label><input type="checkbox" name="modus_24h" {% if linie.modus_24h %}checked{% endif %}> 24h-Modus</label></p>
+        <p><label><input type="checkbox" name="stopp" {% if linie.stopp %}checked{% endif %}> Linie stoppen</label></p>
+        <p><button type="submit">Übernehmen</button></p>
+    </form>
+</body>
+</html>

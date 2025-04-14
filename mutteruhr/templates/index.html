@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Mutteruhr – Übersicht</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background: #f4f4f4;
+        }
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header img {
+            height: 60px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .line-box {
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        .label {
+            display: inline-block;
+            width: 130px;
+            font-weight: bold;
+        }
+        .wert {
+            display: inline-block;
+            min-width: 80px;
+        }
+        .statusfeld.stop {
+            color: red;
+            font-weight: bold;
+        }
+        .statusfeld.laeuft {
+            color: green;
+            font-weight: bold;
+        }
+        .warten {
+            color: darkorange;
+            font-weight: bold;
+        }
+    </style>
+    <script>
+        function toTime(puls, is24h) {
+            if (!puls) return "--:--";
+            puls = parseInt(puls);
+            if (!is24h && puls > 720) puls -= 720;
+            let hh = Math.floor(puls / 60);
+            let mm = puls % 60;
+            return ("0" + hh).slice(-2) + ":" + ("0" + mm).slice(-2);
+        }
+
+        function aktualisiereDaten() {
+            fetch('/status_json')
+                .then(r => r.json())
+                .then(data => {
+                    for (const linie in data) {
+                        const z = data[linie];
+                        document.getElementById("zeit_" + linie).textContent = toTime(z.istpuls, z.modus_24h);
+                        document.getElementById("puls_" + linie).textContent = z.istpuls;
+                        document.getElementById("warten_" + linie).textContent = z.Wartepuls ? "WARTEN" : "";
+                    }
+                });
+            const jetzt = new Date();
+            const d = jetzt.toLocaleDateString("de-DE");
+            const t = jetzt.toLocaleTimeString("de-DE", {hour: '2-digit', minute: '2-digit'});
+            document.getElementById("uhrzeitfeld").textContent = d + " " + t;
+        }
+
+        setInterval(aktualisiereDaten, 1000);
+        window.onload = aktualisiereDaten;
+    </script>
+</head>
+<body>
+<header>
+    <div>Radio-Museum Linsengericht e.V. – Mutteruhr</div>
+    <img src="/static/radiodoc.png" alt="Logo">
+    <div id="uhrzeitfeld"></div>
+</header>
+<div class="container">
+    {% for key, linie in linien.items() %}
+    <div class="line-box">
+        <h2>{{ linie.name }}</h2>
+        <div><span class="label">Istzeit:</span> <span class="wert" id="zeit_{{ key }}">--:--</span></div>
+        <div><span class="label">Istpuls:</span> <span class="wert" id="puls_{{ key }}">{{ linie.istpuls }}</span></div>
+        <div><span class="label">Impulsdauer:</span> <span class="wert">{{ linie.impuls_ms }} ms</span></div>
+        <div><span class="label">Pausendauer:</span> <span class="wert">{{ linie.pause_ms }} ms</span></div>
+        <div><span class="label">Modus:</span> <span class="wert">{{ "24h" if linie.modus_24h else "12h" }}</span></div>
+        <div><span class="label">Status:</span>
+            <span class="wert statusfeld {{ "stop" if linie.stopp else "laeuft" }}">
+                {{ "STOP" if linie.stopp else "LÄUFT" }}
+            </span>
+        </div>
+        <div><span class="label">Warten:</span> <span class="wert warten" id="warten_{{ key }}"></span></div>
+        <button onclick="location.href='/edit/{{ key }}'">Ändern</button>
+    </div>
+    {% endfor %}
+</div>
+</body>
+</html>
