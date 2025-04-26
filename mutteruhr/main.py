@@ -1,8 +1,8 @@
 # Programmname: Mutteruhrsteuerung
-# Version     : 6.1.0
+# Version     : 6.2.0
 # Ersteller   : Wolfram
 # Datum       : 12.04.2025
-print("\n Version     : 6.1.0 \n")
+print("\n Version     : 6.2.0 \n")
 
 ##BEGINN INIT
 import os
@@ -17,9 +17,13 @@ from datetime import datetime
 import threading
 from flask import jsonify
 
+#Set use_H_bridge to true if you use my KiCad-board!
+#set it to False to user relayboards.
+use_H_bridge = True
+
 CONFIG_PATH = '/opt/mutteruhr/mutteruhr.conf'
 file_to_web = "/dev/shm/to_web.json"
-file_to_clock = "/dev/shm/to_clock.json"
+#file_to_clock = "/dev/shm/to_clock.json"
 letzter_ram_timestamp = 0
 Startup = 0
 config = configparser.ConfigParser()
@@ -52,8 +56,12 @@ for i in range(1, 5):
 
     pi.set_mode(linien[key]["gpio_pos"], pigpio.OUTPUT)
     pi.set_mode(linien[key]["gpio_neg"], pigpio.OUTPUT)
-    pi.write(linien[key]["gpio_pos"], 1)
-    pi.write(linien[key]["gpio_neg"], 1)
+    if use_H_bridge == True:
+        pi.write(linien[key]["gpio_pos"], 0)
+        pi.write(linien[key]["gpio_neg"], 0)
+    else:
+        pi.write(linien[key]["gpio_pos"], 1)
+        pi.write(linien[key]["gpio_neg"], 1)
 
     addr = fram_adressen[i - 1]
     lo = fram[addr][0] if isinstance(fram[addr], (bytes, bytearray)) else fram[addr]
@@ -180,7 +188,7 @@ def SchreibeRam():
             print(f"[RAM] Fehler beim Schreiben von to_web.json: {e}")
 
 
-def LeseRam():
+""" def LeseRam():
     global letzter_ram_timestamp, file_to_clock, linien, config, verbose
 
     if not os.path.exists(file_to_clock):
@@ -254,7 +262,7 @@ def LeseRam():
 
     # Konfig zurückschreiben
     with open(CONFIG_PATH, 'w') as cfgfile:
-        config.write(cfgfile)
+        config.write(cfgfile) """
 # ----------------------------
 # Routine: WebServer()
 # ----------------------------
@@ -365,8 +373,8 @@ while Startup < 10:
             # lösche RAM-Dateien falls vorhanden. In diesem Stadium sind es Leichen.
             if os.path.exists(file_to_web):
                 os.remove(file_to_web)
-            if os.path.exists(file_to_clock):
-                os.remove(file_to_clock)
+            #if os.path.exists(file_to_clock):
+            #    os.remove(file_to_clock)
             #lösche ram files
             Startup = 2
 
@@ -387,11 +395,12 @@ while Startup < 10:
 
         case 4:
             if verbose > 0:
-                print("Startup case 4 aktiv: Erzeuge RAM-Datei file to clock")
+            #    print("Startup case 4 aktiv: Erzeuge RAM-Datei file to clock")
+                print("Startup case 4 aktiv: Reserveschritt")
             # Erzeuge zweite RAM-Datei
-            if not os.path.exists(file_to_clock):
-                with open(file_to_clock, "w") as f:
-                    json.dump({"timestamp": 0}, f)
+            #if not os.path.exists(file_to_clock):
+            #    with open(file_to_clock, "w") as f:
+            #        json.dump({"timestamp": 0}, f)
             Startup = 5
 
         case 5:
@@ -407,8 +416,6 @@ while Startup < 10:
             Startup = 7
 
         case 7:
-            if verbose > 0:
-                print("Startup case 7 aktiv: RESERVESCHRITT")
             # vorgesehen für Webserver Start
             if verbose > 0:
                 print("Startup case 7 aktiv: Starte Webserver")
@@ -471,11 +478,17 @@ while Startup == 10:
                 continue
 
             if ist % 2 == 0:
-                pi.write(linie["gpio_pos"], 0)
+                if use_H_bridge==True:
+                    pi.write(linie["gpio_pos"], 1)
+                else:    
+                    pi.write(linie["gpio_pos"], 0)
                 if verbose >= 5:
                     print(f"[{key}] Puls an (GPIO {linie['gpio_pos']})")
             else:
-                pi.write(linie["gpio_neg"], 0)
+                if use_H_bridge==True:
+                    pi.write(linie["gpio_neg"], 1)
+                else:    
+                    pi.write(linie["gpio_neg"], 0)
                 if verbose >= 5:
                     print(f"[{key}] Puls an (GPIO {linie['gpio_neg']})")
 
@@ -489,8 +502,12 @@ while Startup == 10:
             z["next_time"] = current_time + linie["impuls_ms"] / 1000
 
         elif z["phase"] == "puls":
-            pi.write(linie["gpio_pos"], 1)
-            pi.write(linie["gpio_neg"], 1)
+            if use_H_bridge==True:    
+                pi.write(linie["gpio_pos"], 0)
+                pi.write(linie["gpio_neg"], 0)
+            else:
+                pi.write(linie["gpio_pos"], 1)
+                pi.write(linie["gpio_neg"], 1)
             if verbose >= 5:
         
                 print(f"[{key}] Puls aus (beide HIGH)")
@@ -548,6 +565,6 @@ while Startup == 10:
                 print("[CFG] Änderung erkannt – schreibe in FRAM...")
             SchreibeFram()
         SchreibeRam()
-        LeseRam()
+#        LeseRam()
     time.sleep(0.01)
 ##ENDE HAUPTSCHLEIFE
