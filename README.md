@@ -28,7 +28,7 @@ FRAM (via I2C) vorhanden und korrekt adressiert (Start bei 0x00)
 
 Relaiskarte angeschlossen (je Linie: 2 GPIOs für Positiv/Negativ)
 
- - Alternativ die beiliegenden Schaltpläne für H-Brücke...
+ - Alternativ die beiliegenden Schaltpläne für H-Brücke, dann eine Variable setzen....
 
 Netzwerkverbindung (für Webinterface)
 
@@ -52,10 +52,10 @@ Datei-Berechtigungen korrekt gesetzt (chmod +x für main.py)
 3. Verdrahtung
 GPIO-Belegung (Beispielhaft)
 Linie	GPIO POS	GPIO NEG
-1	17	27
-2	5	6
-3	22	23
-4	24	25
+1	16	17
+2	22	23
+3	24	25
+4	26	27
 Achten Sie darauf, dass pro Linie nicht beide Ausgänge gleichzeitig LOW sein dürfen – dies könnte Kurzschlüsse verursachen. Die Software stellt dies sicher.
 
 4. Konfigurationsdatei (mutteruhr.conf)
@@ -65,8 +65,8 @@ ini
 Kopieren
 Bearbeiten
 [Linie1]
-gpio_pos = 17
-gpio_neg = 27
+gpio_pos = 16
+gpio_neg = 17
 impuls_ms = 500
 pause_ms = 200
 modus_24h = true
@@ -119,7 +119,7 @@ Es empfiehlt sich am i2c-Bus eine RTC anzuschließen.
 5.4 Webinterface starten und testen
 main.py startet automatisch einen Webserver auf Port 8080.
 
-Rufen Sie im Browser http://<IP>:8080 auf
+Rufen Sie im Browser http://<IP ihres RPi>:8080 auf
 
 Prüfen Sie: Statusanzeigen, Bearbeiten funktioniert?
 
