@@ -1,8 +1,8 @@
 # Programmname: Mutteruhrsteuerung
-# Version     : 6.2.0
+# Version     : 6.2.1
 # Ersteller   : Wolfram
-# Datum       : 12.04.2025
-print("\n Version     : 6.2.0 \n")
+# Datum       : 28.07.2025
+print("\n Version     : 6.2.1 \n")
 
 ##BEGINN INIT
 import os
@@ -347,13 +347,24 @@ def WebServer():
 
     @app.route("/status_json")
     def status_json():
-        return jsonify({
+        from datetime import datetime
+        now = datetime.now()
+        soll24 = now.hour * 60 + now.minute
+        sollzeit24 = f"{soll24 // 60:02}:{soll24 % 60:02}"
+
+        linienstatus = {
             key: {
                 "istpuls": linie["istpuls"],
                 "Wartepuls": linie["Wartepuls"],
                 "modus_24h": linie["modus_24h"]
             } for key, linie in linien.items()
+        }
+
+        return jsonify({
+            "linien": linienstatus,
+            "sollzeit24": sollzeit24
         })
+
 
 
     app.run(host="0.0.0.0", port=8080, debug=False, use_reloader=False)
