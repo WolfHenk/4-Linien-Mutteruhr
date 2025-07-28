@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -69,17 +68,14 @@
             fetch('/status_json')
                 .then(r => r.json())
                 .then(data => {
-                    for (const linie in data) {
-                        const z = data[linie];
+                    for (const linie in data.linien) {
+                        const z = data.linien[linie];
                         document.getElementById("zeit_" + linie).textContent = toTime(z.istpuls, z.modus_24h);
                         document.getElementById("puls_" + linie).textContent = z.istpuls;
                         document.getElementById("warten_" + linie).textContent = z.Wartepuls ? "WARTEN" : "";
                     }
+                    document.getElementById("uhrzeitfeld").textContent = "Sollzeit: " + data.sollzeit24;
                 });
-            const jetzt = new Date();
-            const d = jetzt.toLocaleDateString("de-DE");
-            const t = jetzt.toLocaleTimeString("de-DE", {hour: '2-digit', minute: '2-digit'});
-            document.getElementById("uhrzeitfeld").textContent = d + " " + t;
         }
 
         setInterval(aktualisiereDaten, 1000);
@@ -90,7 +86,7 @@
 <header>
     <div>Radio-Museum Linsengericht e.V. – Mutteruhr</div>
     <img src="/static/radiodoc.png" alt="Logo">
-    <div id="uhrzeitfeld"></div>
+    <div id="uhrzeitfeld">Sollzeit: --:--</div>
 </header>
 <div class="container">
     {% for key, linie in linien.items() %}
