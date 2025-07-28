@@ -142,7 +142,7 @@ Bei Umstellung erfolgt automatische Korrektur von istpuls
 Zeiteingabe > 12:00 im 12h-Modus → automatisch istpuls -= 720
 
 7. Wartung
-FRAM wird regelmäßig aktualisiert nach jedem Setzen eines Ausgangs
+FRAM wird regelmäßig aktualisiert nach jedem Setzen eines Ausgangs 
 
 Config-Änderungen über Webinterface → automatische .conf-Aktualisierung
 
