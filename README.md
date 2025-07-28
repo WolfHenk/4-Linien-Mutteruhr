@@ -51,11 +51,11 @@ Datei-Berechtigungen korrekt gesetzt (chmod +x für main.py)
 
 3. Verdrahtung
 GPIO-Belegung (Beispielhaft)
-Linie	GPIO POS	GPIO NEG
-1	16	17
-2	22	23
-3	24	25
-4	26	27
+Linie	GPIO POS	GPIO NEG\n
+1	16	17\n
+2	22	23\n
+3	24	25\n
+4	26	27\n
 Achten Sie darauf, dass pro Linie nicht beide Ausgänge gleichzeitig LOW sein dürfen – dies könnte Kurzschlüsse verursachen. Die Software stellt dies sicher.
 
 4. Konfigurationsdatei (mutteruhr.conf)
