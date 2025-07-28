@@ -119,7 +119,7 @@ Es empfiehlt sich am i2c-Bus eine RTC anzuschließen.
 5.4 Webinterface starten und testen
 main.py startet automatisch einen Webserver auf Port 8080.
 
-Rufen Sie im Browser http://<IP ihres RPi>:8080 auf
+Rufen Sie im Browser http://\<IP ihres RPi\>:8080 auf
 
 Prüfen Sie: Statusanzeigen, Bearbeiten funktioniert?
 
