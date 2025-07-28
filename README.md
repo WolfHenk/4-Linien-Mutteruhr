@@ -1,7 +1,7 @@
 Inbetriebnahme-Anleitung
-System: Mutteruhrsteuerung – Version 5.0.0
+System: Mutteruhrsteuerung – Version 6.2.1
 Ersteller: Wolfram
-Stand: 2025-04-12
+Stand: 2025-07-28
 
 1. Ziel und Zweck
 Diese Anleitung beschreibt die vollständige Erstinbetriebnahme der Mutteruhrsteuerung auf Raspberry Pi inklusive:
