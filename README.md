@@ -28,7 +28,7 @@ FRAM (via I2C) vorhanden und korrekt adressiert (Start bei 0x00)
 
 Relaiskarte angeschlossen (je Linie: 2 GPIOs für Positiv/Negativ)
 
- - Alternativ die beiliegenden Schaltpläne für H-Brücke, dann eine Variable setzen....
+ - Alternativ die beiliegenden Schaltpläne für Motortreiberplatine mit H-Brücken, dann eine Variable setzen....
 
 Netzwerkverbindung (für Webinterface)
 
@@ -37,33 +37,29 @@ Python 3 installiert
 
 adafruit_fram, pigpio, busio, board installiert (via pip3)
 
-Ordner /opt/mutteruhr mit folgenden Dateien:
+Ordner /opt/mutteruhr erstellt mit mindestens folgenden Dateien:
 
 main.py (aktuelle Version)
-
 mutteruhr.conf
+sowie den ornern /static und /templates jeweils mit den Inhalten
 
 clocks.py (falls Anzeige gewünscht)
-
-evtl. Webinterface-Komponenten
 
 Datei-Berechtigungen korrekt gesetzt (chmod +x für main.py)
 
 3. Verdrahtung
 GPIO-Belegung (Beispielhaft)
-Linie	GPIO POS	GPIO NEG\n
-1	16	17\n
-2	22	23\n
-3	24	25\n
-4	26	27\n
+Linie - GPIO POS - GPIO NEG
+1 - 16 - 17
+2 - 22 - 23
+3 - 24 - 25
+4 - 26 - 27
 Achten Sie darauf, dass pro Linie nicht beide Ausgänge gleichzeitig LOW sein dürfen – dies könnte Kurzschlüsse verursachen. Die Software stellt dies sicher.
 
 4. Konfigurationsdatei (mutteruhr.conf)
-Bearbeiten Sie die Datei /opt/mutteruhr/mutteruhr.conf. Achten Sie darauf, pro Linie den Abschnitt LinieX mit folgenden Werten zu definieren:
+Bearbeiten Sie die Datei /opt/mutteruhr/mutteruhr.conf.
+Achten Sie darauf, pro Linie den Abschnitt LinieX mit folgenden Werten zu definieren: (für Betrieb mir Motortreiberplatine ist keine Änderung der voreingestellten Datei nötig.)
 
-ini
-Kopieren
-Bearbeiten
 [Linie1]
 gpio_pos = 16
 gpio_neg = 17
@@ -73,14 +69,11 @@ modus_24h = true
 stopp = false
 aktiv = true
 name = Historische Uhr 1
-Zusätzliche Sektion:
 
-ini
-Kopieren
-Bearbeiten
 [System]
 conf_verbose = 3
 WebActive = true
+
 Tipp: Für Testbetrieb stopp = true setzen und später im Webinterface deaktivieren.
 
 5. Inbetriebnahme-Schritte
@@ -101,7 +94,7 @@ Webserverstart (bei Startup 7)
 
 Hauptschleife
 
-5.2 Prüfung der Relaisausgänge
+5.2 Prüfung der Ausgänge
 Erhöhen Sie bei Bedarf conf_verbose = 5 in der mutteruhr.conf, um jede Impulsausgabe auf der Konsole zu verfolgen.
 
 Beispielausgabe bei aktiver Linie:
@@ -125,6 +118,9 @@ Prüfen Sie: Statusanzeigen, Bearbeiten funktioniert?
 
 Stellen Sie Uhrzeit einer Linie testweise und beobachten Sie Ergebnis
 
+Es liegt eine Datei mutteruhr.service bei. 
+Mit dem befehl "sudo cp mutteruhr.service /lib/systemd/system" kopieren wir die mutteruhr.service nach /lib/systemd/system. Dadurch wird nach dem nächsten Neustart die Uhr automatisch starten...
+
 6. Besonderheiten und Verhalten
    
 6.1 Pulsausgabe
@@ -136,6 +132,7 @@ Bei zu großem Vorsprung (z. B. durch Sommerzeitumstellung) → „WARTEN“-M
 
 6.2 Umstellung zwischen 12h- und 24h-Modus
 Bei modus_24h = false (12h): max. 720 Pulse/Tag
+modus_24h = true liefert 1440 Impulse in 24 Stunden (für z.B. Klappfallzahlenuhren)
 
 Bei Umstellung erfolgt automatische Korrektur von istpuls
 
@@ -143,6 +140,7 @@ Zeiteingabe > 12:00 im 12h-Modus → automatisch istpuls -= 720
 
 7. Wartung
 FRAM wird regelmäßig aktualisiert nach jedem Setzen eines Ausgangs 
+FRAM enthält solit immer den aktuellen Impulsstand der einzelnen Linien. Dadurch Stromausfallsicher (ohne die SD_Karte kaputt zu schreiben).
 
 Config-Änderungen über Webinterface → automatische .conf-Aktualisierung
 
@@ -154,16 +152,19 @@ Keine Impulse	Linie stopp = true, aktiv = false	In .conf oder Web prüfen
 „WARTEN“ wird angezeigt	istpuls liegt >65 über Sollzeit	Uhrzeit war voreilig eingestellt
 Webinterface nicht erreichbar	Port blockiert, Adresse falsch	conf_verbose > 0 setzen und Logs prüfen
 Falsche Uhrzeit	Falsche Moduswahl (12h/24h)	Modus und istpuls prüfen
-9. Abschließender Funktionstest
+
+10. Abschließender Funktionstest
 Für jede Linie:
 
 Anzeige „läuft“ sichtbar?
 
 istpuls plausibel?
 
-Relais klicken hörbar?
+Relais klicken hörbar (nicht bei Motortreiberplatine)?
 
 Uhr geht sichtbar im Takt weiter?
 
 Nur wenn alle Punkte erfüllt sind, ist die Inbetriebnahme erfolgreich abgeschlossen.
+
+Wenn noch unklarheiten bestehen, dann baue ich auch noch ein script, wodurch das alles automatisch installiert wird. Kost Dich 'n Kaffee.....
 
